@@ -115,7 +115,7 @@ After running ~8 narratives through `report_event`, query the SDK:
 ```python
 results = memory.search(
     query="recurring asset concerns and inspector practices",
-    user_id="inspector_demo",      # ★ must match the user_id used at write time
+    user_id="inspector_demo",      # * must match the user_id used at write time
     agent_id="CITY",
     record_types=["fact", "preference", "guideline", "memory"],
     max_results=20,
@@ -124,7 +124,7 @@ for r in results:
     print(f"  [{r.record.record_type:11s}] {r.record.content}")
 ```
 
-> ⚠️ **You can't search the SDK "across all users."** The public `memory.search()` API enforces exact user scoping — passing `exact_user_match=False` raises:
+> WARNING: **You can't search the SDK "across all users."** The public `memory.search()` API enforces exact user scoping — passing `exact_user_match=False` raises:
 > ```
 > ValueError: OracleAgentMemory client searches require exact user scoping.
 > ```

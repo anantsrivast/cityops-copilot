@@ -51,7 +51,7 @@ class LocalSentenceTransformerEmbedder(IEmbedder):
 
 **Why `.astype(np.float32)`?** Oracle's `VECTOR(384)` column expects 32-bit floats. `sentence-transformers` already returns `float32`, but the cast guards against model swaps later.
 
-> ⏳ First `SentenceTransformer(...)` call downloads ~90MB. Subsequent runs use the cached model.
+>  First `SentenceTransformer(...)` call downloads ~90MB. Subsequent runs use the cached model.
 
 ---
 

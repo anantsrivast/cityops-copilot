@@ -15,7 +15,7 @@ The `oracleagentmemory` SDK only allows **4 record types** in its memory table (
 | **SDK** (managed by `oracleagentmemory`) | Conversational maintenance narratives + auto-extracted semantic memory | Field notes, tribal-knowledge guidelines (*"east scupper at Pier 2 needs annual clearing"*), inspector preferences |
 | **Hand-rolled SQL** (raw tables alongside the SDK) | Structured domain objects + their embeddings | `CITY_ASSET` (26-asset registry), `CITY_INSPECTION_FINDING` (~220 findings with `VECTOR(384)` column + HNSW index) |
 
-> 📖 The full schema breakdown is in `sdk-data-model.md`. The data model is the *why* — start there if the design feels surprising.
+>  The full schema breakdown is in `sdk-data-model.md`. The data model is the *why* — start there if the design feels surprising.
 
 ---
 

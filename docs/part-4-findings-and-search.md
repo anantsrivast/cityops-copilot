@@ -86,7 +86,7 @@ with vector_conn.cursor() as cur:
                 :description, :recommendation, :days_ago, :embedding)
     """, rows)
 vector_conn.commit()
-print(f"✓ Inserted {len(rows)} findings.")
+print(f" Inserted {len(rows)} findings.")
 ```
 
 ~220 findings × one local embedding each. Takes 10–30 seconds on a Mac.

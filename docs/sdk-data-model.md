@@ -40,14 +40,14 @@ This workshop uses the SDK with `table_name_prefix="CITY_"`, so every SDK-create
   │  record_id (PK)      │    │  record_id (PK)      │  │  chunk_id (PK)     │
   │  thread_id (FK)      │    │  thread_id (FK)      │  │  source_id         │
   │  order_seq (autoinc) │    │  order_seq (autoinc) │  │  source_record_type│
-  │  message_role        │    │  memory_type ★       │  │  source_emb_column │
+  │  message_role        │    │  memory_type *       │  │  source_emb_column │
   │  content (CLOB)      │    │  content (CLOB)      │  │  thread_id         │
   │  metadata (JSON)     │    │  metadata (JSON)     │  │  user_id           │
   │  user_id             │    │  user_id             │  │  agent_id          │
   │  agent_id            │    │  agent_id            │  │  embedding         │
-  │  space_id            │    │  space_id            │  │  VECTOR(384) ★★    │
+  │  space_id            │    │  space_id            │  │  VECTOR(384) **    │
   └──────────────────────┘    └──────────────────────┘  └────────────────────┘
-                                         ★ closed taxonomy:                                              ★★ shared HNSW
+                                         * closed taxonomy:                                              ** shared HNSW
                                            {fact, memory,                                                 vector index
                                             preference,                                                   over all
                                             guideline}                                                    embeddings
@@ -154,7 +154,7 @@ CREATE TABLE CITY_MEMORY (
   user_id         VARCHAR2(128),
   agent_id        VARCHAR2(128),
   space_id        VARCHAR2(128),
-  memory_type     VARCHAR2(128) NOT NULL,   -- ★ pinned to {fact, memory, preference, guideline}
+  memory_type     VARCHAR2(128) NOT NULL,   -- * pinned to {fact, memory, preference, guideline}
   content         CLOB,
   timestamp       VARCHAR2(64),
   metadata        JSON,
@@ -165,7 +165,7 @@ CREATE TABLE CITY_MEMORY (
 );
 ```
 
-★ **The critical detail.** `memory_type` is `VARCHAR2(128)` at the schema level — so the *database* could store anything. But the SDK validates `memory_type` against a hard-coded `frozenset` before writing:
+* **The critical detail.** `memory_type` is `VARCHAR2(128)` at the schema level — so the *database* could store anything. But the SDK validates `memory_type` against a hard-coded `frozenset` before writing:
 
 ```python
 # In oracleagentmemory/core/oracledbmemorystore.py

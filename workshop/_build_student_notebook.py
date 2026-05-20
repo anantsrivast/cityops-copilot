@@ -42,7 +42,7 @@ md(
     "realistic dataset of 308 maintenance logs and ~220 inspection findings "
     "across 26 urban infrastructure assets (bridges, substations, pipelines, "
     "water treatment, sensors, comms towers, seawalls).\n\n"
-    "> 📖 Open `docs/overview.md` for the one-pager."
+    ">  Open `docs/overview.md` for the one-pager."
 )
 
 md(
@@ -54,7 +54,7 @@ md(
     "| `CITY_ASSET` (hand-rolled SQL) | The plant's asset registry — 26 assets from real data | Bulk-loaded from `data/maintenance_logs.json` + `data/inspection_reports.json` |\n"
     "| `CITY_INSPECTION_FINDING` (hand-rolled SQL with `VECTOR(384)`) | Structured findings — category, severity, description, recommendation, grade | ~220 findings bulk-loaded from `data/inspection_reports.json` |\n"
     "| Conversational messages (SDK) | Per-asset inspection threads, naturally scoped to the asset | `thread.add_messages` |\n\n"
-    "> 📖 **Two storage layers?** The SDK only allows 4 native record types "
+    ">  **Two storage layers?** The SDK only allows 4 native record types "
     "(`fact`, `memory`, `preference`, `guideline`). Domain objects need their "
     "own SQL tables. Oracle's converged engine makes this clean — same "
     "connection, vector search via `VECTOR_DISTANCE()` available everywhere. "
@@ -105,7 +105,7 @@ code(
     "        _k, _v = _line.split(\"=\", 1)\n"
     "        # .setdefault — env vars already set externally (Codespaces secrets) win.\n"
     "        os.environ.setdefault(_k.strip(), _v.strip().strip('\"').strip(\"'\"))\n"
-    "    print(f\"✓ Loaded env vars from {_env_file.resolve()}\")\n"
+    "    print(f\" Loaded env vars from {_env_file.resolve()}\")\n"
     "else:\n"
     "    print(\"ℹ No .env file found — assuming env vars are set externally\")\n"
     "\n"
@@ -146,10 +146,10 @@ code(
     "        try:\n"
     "            print(f\"Connection attempt {attempt}/{max_retries} — {mode}...\")\n"
     "            conn = oracledb.connect(**kwargs)\n"
-    "            print(f\"✓ Connected as {kwargs['user']}.\")\n"
+    "            print(f\" Connected as {kwargs['user']}.\")\n"
     "            return conn\n"
     "        except oracledb.OperationalError as e:\n"
-    "            print(f\"✗ {e}\")\n"
+    "            print(f\" {e}\")\n"
     "            if attempt < max_retries:\n"
     "                time.sleep(retry_delay)\n"
     "            else:\n"
@@ -163,8 +163,8 @@ code(
 )
 
 md(
-    "✓ Connected. Next: wire up the SDK's embedder + create the schema.\n\n"
-    "> 💡 **Key insight — Part 1:** Oracle AI Database is a converged engine. "
+    " Connected. Next: wire up the SDK's embedder + create the schema.\n\n"
+    ">  **Key insight — Part 1:** Oracle AI Database is a converged engine. "
     "The SDK's tables, our hand-rolled `CITY_ASSET` / `CITY_INSPECTION_FINDING` "
     "tables, and any other SQL all live on this same connection. Vector search "
     "via `VECTOR_DISTANCE()` works across all of them."
@@ -175,7 +175,7 @@ md(
 # ────────────────────────────────────────────────────────────────────────────
 
 md(
-    "### 🧹 Optional: Reset The Workspace\n\n"
+    "###  Optional: Reset The Workspace\n\n"
     "If you've run this workshop before (or are sharing an Oracle instance with "
     "someone who has), the SDK's tables (`CITY_THREAD`, `CITY_MESSAGE`, "
     "`CITY_MEMORY`, `CITY_RECORD_CHUNKS`, `CITY_ACTOR_PROFILE`) and the "
@@ -211,7 +211,7 @@ code(
     "        except Exception:\n"
     "            pass  # table didn't exist — fine\n"
     "vector_conn.commit()\n"
-    "print(\"\\n✓ Workspace clean. RESTART THE KERNEL before re-running Part 2 if you've already done it.\")"
+    "print(\"\\n Workspace clean. RESTART THE KERNEL before re-running Part 2 if you've already done it.\")"
 )
 
 # ────────────────────────────────────────────────────────────────────────────
@@ -258,12 +258,12 @@ code(
 )
 
 code(
-    "# ✅ Checkpoint: TODO 1\n"
+    "# PASS: Checkpoint: TODO 1\n"
     "embedder = LocalSentenceTransformerEmbedder()\n"
     "_v = embedder.embed([\"corrosion on bearing assembly\"])\n"
     "assert _v.shape == (1, 384), f\"Expected (1, 384), got {_v.shape}\"\n"
     "assert _v.dtype == np.float32, f\"Expected float32, got {_v.dtype}\"\n"
-    "print(\"✅ TODO 1 passed — embedder returns float32 (n, 384) arrays\")"
+    "print(\"PASS: TODO 1 passed — embedder returns float32 (n, 384) arrays\")"
 )
 
 md(
@@ -302,7 +302,7 @@ code(
     "    schema_policy=SchemaPolicy.CREATE_IF_NECESSARY,\n"
     "    table_name_prefix=\"CITY_\",\n"
     ")\n"
-    "print(\"✓ OracleAgentMemory ready. Tables under prefix CITY_*\")"
+    "print(\" OracleAgentMemory ready. Tables under prefix CITY_*\")"
 )
 
 # ────────────────────────────────────────────────────────────────────────────
@@ -384,7 +384,7 @@ code(
     "        [(e[\"asset_id\"], e[\"asset_class\"]) for e in equipment],\n"
     "    )\n"
     "vector_conn.commit()\n"
-    "print(f\"✓ Inserted {len(equipment)} rows into CITY_ASSET.\")"
+    "print(f\" Inserted {len(equipment)} rows into CITY_ASSET.\")"
 )
 
 code(
@@ -431,7 +431,7 @@ code(
 )
 
 code(
-    "# ✅ Checkpoint: TODO 2 — smoke test with one real narrative from the dataset\n"
+    "# PASS: Checkpoint: TODO 2 — smoke test with one real narrative from the dataset\n"
     "_seed = _logs[0]  # First maintenance log — likely Harbor Bridge routine inspection\n"
     "ids = report_event(\n"
     "    asset_id=_seed[\"asset_name\"],\n"
@@ -440,7 +440,7 @@ code(
     "    thread_id=\"smoke_thread\",\n"
     ")\n"
     "assert ids and len(ids) >= 1, \"TODO 2 incomplete — add_messages should return at least one ID\"\n"
-    "print(f\"✅ TODO 2 passed — added message(s): {ids}\")"
+    "print(f\"PASS: TODO 2 passed — added message(s): {ids}\")"
 )
 
 md(
@@ -465,7 +465,7 @@ code(
     "             ORDER BY order_seq\n"
     "        \"\"\", bind)\n"
     "        msgs = cur.fetchall()\n"
-    "        print(f\"📋 CITY_MESSAGE — {len(msgs)} row(s)\" + (f\" for thread={thread_id}\" if thread_id else \"\"))\n"
+    "        print(f\" CITY_MESSAGE — {len(msgs)} row(s)\" + (f\" for thread={thread_id}\" if thread_id else \"\"))\n"
     "        for role, preview, uid, aid in msgs:\n"
     "            text = preview.read() if hasattr(preview, 'read') else preview\n"
     "            print(f\"   [{role:9}] user={uid or '-':18} agent={aid or '-':6} | {text}\")\n"
@@ -476,7 +476,7 @@ code(
     "             ORDER BY order_seq\n"
     "        \"\"\", bind)\n"
     "        mems = cur.fetchall()\n"
-    "        print(f\"\\n🧠 CITY_MEMORY — {len(mems)} row(s)\" + (f\" for thread={thread_id}\" if thread_id else \"\"))\n"
+    "        print(f\"\\n CITY_MEMORY — {len(mems)} row(s)\" + (f\" for thread={thread_id}\" if thread_id else \"\"))\n"
     "        for mtype, preview, uid, aid in mems:\n"
     "            text = preview.read() if hasattr(preview, 'read') else preview\n"
     "            print(f\"   [{mtype:10}] user={uid or '-':18} agent={aid or '-':6} | {text}\")\n"
@@ -530,7 +530,7 @@ code(
 )
 
 code(
-    "# ✅ Checkpoint: TODO 3\n"
+    "# PASS: Checkpoint: TODO 3\n"
     "# The SDK's high-level search REQUIRES a specific user_id (it rejects\n"
     "# exact_user_match=False). We wrote the records with inspector=\"inspector_demo\",\n"
     "# so we search for the same.\n"
@@ -545,7 +545,7 @@ code(
     "    f\"TODO 3 — expected at least 5 extracted records from 8 narratives, got {len(_results)}.\\n\"\n"
     "    \"Check OCI_GENAI_API_KEY and that you called report_event for all 8 narratives.\"\n"
     ")\n"
-    "print(f\"✅ TODO 3 passed — {len(_results)} memories extracted from 8 narratives\")"
+    "print(f\"PASS: TODO 3 passed — {len(_results)} memories extracted from 8 narratives\")"
 )
 
 md(
@@ -576,7 +576,7 @@ md(
     "Oracle's converged DB lets us mix vector similarity with relational filters "
     "(asset, category, severity, time window) in **one SQL statement** — no "
     "metadata-filter quirks, full SQL expressiveness.\n\n"
-    "> 📖 Open `docs/part-4-findings-and-search.md` for the full walk-through."
+    ">  Open `docs/part-4-findings-and-search.md` for the full walk-through."
 )
 
 code(
@@ -610,7 +610,7 @@ code(
     "    except Exception as e:\n"
     "        print(f\"  (skipped HNSW index: {e})\")\n"
     "vector_conn.commit()\n"
-    "print(\"✓ CITY_INSPECTION_FINDING created with VECTOR(384) embedding column.\")"
+    "print(\" CITY_INSPECTION_FINDING created with VECTOR(384) embedding column.\")"
 )
 
 code(
@@ -648,7 +648,7 @@ code(
     "                :description, :recommendation, :days_ago, :embedding)\n"
     "    \"\"\", rows)\n"
     "vector_conn.commit()\n"
-    "print(f\"✓ Inserted {len(rows)} findings into CITY_INSPECTION_FINDING.\")"
+    "print(f\" Inserted {len(rows)} findings into CITY_INSPECTION_FINDING.\")"
 )
 
 md(
@@ -695,7 +695,7 @@ code(
 )
 
 code(
-    "# ✅ Checkpoint: TODO 4\n"
+    "# PASS: Checkpoint: TODO 4\n"
     "_fid = log_finding(\n"
     "    asset_id=\"Harbor Bridge\",\n"
     "    inspector=\"checkpoint_test\",\n"
@@ -715,7 +715,7 @@ code(
     "    )\n"
     "    n = cur.fetchone()[0]\n"
     "assert n == 1, \"TODO 4 — checkpoint test finding not retrievable\"\n"
-    "print(f\"✅ TODO 4 passed — finding_id={_fid}\")"
+    "print(f\"PASS: TODO 4 passed — finding_id={_fid}\")"
 )
 
 md(
@@ -751,7 +751,7 @@ code(
 )
 
 code(
-    "# ✅ Checkpoint: TODO 5\n"
+    "# PASS: Checkpoint: TODO 5\n"
     "_broad = find_similar_findings(\"bearing corrosion at piers\", k=5)\n"
     "_bridge = find_similar_findings(\"bearing corrosion at piers\", asset_id=\"Harbor Bridge\", k=5)\n"
     "_corrosion_only = find_similar_findings(\"bearing corrosion at piers\", category=\"corrosion\", k=5)\n"
@@ -761,7 +761,7 @@ code(
     "    \"TODO 5 — asset_id filter should restrict results to Harbor Bridge\"\n"
     "assert _corrosion_only and all(r[\"category\"] == \"corrosion\" for r in _corrosion_only), \\\n"
     "    \"TODO 5 — category filter should restrict results to corrosion only\"\n"
-    "print(f\"✅ TODO 5 passed — broad={len(_broad)}, asset-filtered={len(_bridge)}, category-filtered={len(_corrosion_only)}\")\n"
+    "print(f\"PASS: TODO 5 passed — broad={len(_broad)}, asset-filtered={len(_bridge)}, category-filtered={len(_corrosion_only)}\")\n"
     "for r in _bridge[:3]:\n"
     "    print(f\"  score={r['score']:.3f}  [{r['category']}/{r['severity']}]  {str(r['description'])[:90]}\")"
 )
@@ -791,7 +791,7 @@ code(
     "    content=\"On Harbor Bridge, inspect Pier 2 bearings annually — corrosion-prone since 2024.\",\n"
     "    agent_id=\"CITY\",\n"
     ")\n"
-    "print(\"✓ Mercer wrote one personal memory and one city-wide memory.\")"
+    "print(\" Mercer wrote one personal memory and one city-wide memory.\")"
 )
 
 code(
@@ -822,11 +822,11 @@ code(
     "    \"Cross-inspector leak: Mercer's personal note showed up in Vance's user-scoped search\"\n"
     "assert any(\"Pier 2\" in r.record.content for r in vance_city), \\\n"
     "    \"Pier 2 guideline not retrievable at agent scope — check agent_id wiring\"\n"
-    "print(\"✓ Multi-tenancy verified: Vance sees city-wide guidelines but NOT Mercer's personal notes.\")"
+    "print(\" Multi-tenancy verified: Vance sees city-wide guidelines but NOT Mercer's personal notes.\")"
 )
 
 md(
-    "> 💡 **Key insight — Part 5:** scoping is enforced as a SQL `WHERE` clause "
+    ">  **Key insight — Part 5:** scoping is enforced as a SQL `WHERE` clause "
     "on `user_id` / `agent_id` / `thread_id` columns — not as a soft filter in "
     "Python. A bug in your harness can't leak Mercer's note to Vance; only a "
     "SQL injection could. For regulated infrastructure, add VPD policies on top "
@@ -844,7 +844,7 @@ md(
     "asset lookup (`CITY_ASSET` SQL), the context card (SDK), similar-finding "
     "search (`CITY_INSPECTION_FINDING` SQL via `VECTOR_DISTANCE()`), agent LLM "
     "call, and persistence (which triggers auto-extraction).\n\n"
-    "> 📖 Open `docs/part-6-copilot-end-to-end.md` for the architecture diagram."
+    ">  Open `docs/part-6-copilot-end-to-end.md` for the architecture diagram."
 )
 
 code(
@@ -919,7 +919,7 @@ code(
 )
 
 code(
-    "# ✅ Checkpoint: TODO 6 — smoke test\n"
+    "# PASS: Checkpoint: TODO 6 — smoke test\n"
     "_smoke = call_copilot(\n"
     "    narrative=\"Smoke test — please ignore. One-line check on Harbor Bridge.\",\n"
     "    inspector_id=\"smoke_inspector\",\n"
@@ -927,7 +927,7 @@ code(
     "    asset_id=\"Harbor Bridge\",\n"
     ")\n"
     "assert _smoke and len(_smoke) > 10, \"TODO 6 — copilot returned empty/short answer\"\n"
-    "print(\"✅ TODO 6 passed — copilot ran end-to-end\")\n"
+    "print(\"PASS: TODO 6 passed — copilot ran end-to-end\")\n"
     "print(f\"\\nSample response (first 300 chars):\\n  {_smoke[:300]}\")"
 )
 
@@ -965,7 +965,7 @@ code(
     "    overall_grade=\"C\",\n"
     "    days_ago=0,\n"
     ")\n"
-    "print(f\"\\n📝 Mercer's copilot response:\\n{MERCER_NOTES}\")"
+    "print(f\"\\n Mercer's copilot response:\\n{MERCER_NOTES}\")"
 )
 
 code(
@@ -983,7 +983,7 @@ code(
     "    thread_id=\"asset_harbor_bridge\",\n"
     "    asset_id=\"Harbor Bridge\",\n"
     ")\n"
-    "print(f\"\\n📝 Mercer's followup response:\\n{MERCER_FOLLOWUP}\")"
+    "print(f\"\\n Mercer's followup response:\\n{MERCER_FOLLOWUP}\")"
 )
 
 code(
@@ -1001,7 +1001,7 @@ code(
     "    thread_id=\"asset_harbor_bridge\",\n"
     "    asset_id=\"Harbor Bridge\",\n"
     ")\n"
-    "print(f\"\\n📝 Vance's copilot response (built from Mercer's work, NO human handoff):\\n{VANCE_DIAGNOSIS}\")"
+    "print(f\"\\n Vance's copilot response (built from Mercer's work, NO human handoff):\\n{VANCE_DIAGNOSIS}\")"
 )
 
 md(

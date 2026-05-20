@@ -48,10 +48,10 @@ These match the credentials baked into `.devcontainer/docker-compose.yml`.
 After running the helper + the `vector_conn = connect_to_oracle()` cell, you should see:
 
 ```
-✓ Loaded env vars from /path/to/.env
+ Loaded env vars from /path/to/.env
   mode: ADB / wallet  (...)
 Connection attempt 1/3 — ADB (...)...
-✓ Connected as ANANT.
+ Connected as ANANT.
 ```
 
 Or, in Codespaces:
@@ -60,7 +60,7 @@ Or, in Codespaces:
 ℹ No .env file found — assuming env vars are set externally
   mode: local (Codespaces / Oracle Free on localhost:1521)
 Connection attempt 1/3 — local (localhost:1521/FREEPDB1)...
-✓ Connected as VECTOR.
+ Connected as VECTOR.
 ```
 
 ## Coexistence

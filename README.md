@@ -25,7 +25,7 @@ The `oracleagentmemory` SDK only allows 4 record types in its MEMORY table (`fac
 | Scoping (`user_id` = inspector, `agent_id="CITY"`, `thread_id` = per asset) | Inspector-personal vs city-wide knowledge | Demoed in Part 5 |
 | Context cards (SDK) | Per-asset thread briefing the LLM sees | Used in Part 6's `call_copilot` |
 
-> 📖 See `docs/overview.md` for the one-pager, `docs/sdk-data-model.md` for the SDK schema breakdown.
+>  See `docs/overview.md` for the one-pager, `docs/sdk-data-model.md` for the SDK schema breakdown.
 
 ## Workshop Structure
 
@@ -44,4 +44,4 @@ Inspector A logs a finding on Harbor Bridge ("corrosion on Pier 2 bearing assemb
 
 ## Status
 
-🚧 Workshop scaffolding in place. Notebooks and docs to follow.
+ Workshop scaffolding in place. Notebooks and docs to follow.
