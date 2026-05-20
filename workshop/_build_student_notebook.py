@@ -445,8 +445,11 @@ md(
     "1. The cell below samples 8 narratives from `data/maintenance_logs.json` "
     "spanning different assets and severities.\n"
     "2. Loop over them and call `report_event(...)` with `thread_id=\"inspect_demo\"`.\n"
-    "3. Query `memory.search` filtered to the four native record types, scoped "
-    "to `agent_id=\"CITY\"` (city-wide view across inspectors), and print each result.\n\n"
+    "3. Query `memory.search` filtered to the four native record types. **You must "
+    "specify the same `user_id` you wrote with** (`\"inspector_demo\"`) — the SDK's "
+    "high-level search rejects `exact_user_match=False`, and the records have "
+    "`user_id=\"inspector_demo\"` inherited from the thread, so passing `user_id=None` "
+    "would return zero. Print each extracted record's `record_type` and `content`.\n\n"
     "Expect at least 10+ extracted memories across the 8 narratives — the real "
     "maintenance logs are dense and the extractor finds plenty of structure."
 )
@@ -484,9 +487,12 @@ code(
 
 code(
     "# ✅ Checkpoint: TODO 3\n"
+    "# The SDK's high-level search REQUIRES a specific user_id (it rejects\n"
+    "# exact_user_match=False). We wrote the records with inspector=\"inspector_demo\",\n"
+    "# so we search for the same.\n"
     "_results = memory.search(\n"
     "    query=\"recurring asset concerns and inspector practices\",\n"
-    "    user_id=None,\n"
+    "    user_id=\"inspector_demo\",\n"
     "    agent_id=\"CITY\",\n"
     "    record_types=[\"fact\", \"preference\", \"guideline\", \"memory\"],\n"
     "    max_results=50,\n"

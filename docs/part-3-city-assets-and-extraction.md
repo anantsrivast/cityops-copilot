@@ -115,7 +115,7 @@ After running ~8 narratives through `report_event`, query the SDK:
 ```python
 results = memory.search(
     query="recurring asset concerns and inspector practices",
-    user_id=None,  # search across all inspectors
+    user_id="inspector_demo",      # ★ must match the user_id used at write time
     agent_id="CITY",
     record_types=["fact", "preference", "guideline", "memory"],
     max_results=20,
@@ -123,6 +123,14 @@ results = memory.search(
 for r in results:
     print(f"  [{r.record.record_type:11s}] {r.record.content}")
 ```
+
+> ⚠️ **You can't search the SDK "across all users."** The public `memory.search()` API enforces exact user scoping — passing `exact_user_match=False` raises:
+> ```
+> ValueError: OracleAgentMemory client searches require exact user scoping.
+> ```
+> The SDK is opinionated here for security: every search must specify whose memory you're looking at. Practical consequence: either (a) search by a specific `user_id`, (b) drop to the private `memory._store.search()` for unrestricted access, or (c) query `CITY_MEMORY` directly via SQL.
+>
+> Since our 8 narratives were written under `inspector="inspector_demo"`, the records all inherited `user_id="inspector_demo"` from the thread — that's what we search for.
 
 **Expected output** (exact wording varies):
 

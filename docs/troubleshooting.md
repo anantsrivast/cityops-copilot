@@ -54,18 +54,37 @@ Three usual causes:
 3. **Rate limits** — xAI Grok occasionally returns 429s. Wait a minute and retry just that cell.
 
 ### `memory.search` returns nothing for records I know are there
-Check the scope:
-- Default `exact_user_match=True` — if you pass `user_id="alex"` but records have `user_id IS NULL`, you get zero hits.
-- For city-wide records (`agent_id="CITY"`, no specific user), pass `user_id=None` explicitly:
+Two distinct traps:
 
+**Trap 1: `user_id=None` does NOT mean "any user."** The SDK's default `exact_user_match=True` interprets `user_id=None` as "match records where `user_id IS NULL` exactly" — not "leave user dim unconstrained." If the records you want have a populated `user_id` (e.g. set by `thread.add_messages` from the thread's `user_id`), `user_id=None` returns zero.
+
+**Trap 2: You can't search "across all users."** Passing `exact_user_match=False` raises:
+```
+ValueError: OracleAgentMemory client searches require exact user scoping.
+Do not set exact_user_match=False.
+```
+The public API forces exact user scoping for security.
+
+**To search records with a populated user_id**, you MUST pass that exact user_id:
 ```python
 memory.search(
     query=...,
-    user_id=None,                # required: tells the SDK to leave user dim unconstrained
+    user_id="inspector_demo",  # must match the user_id at write time
     agent_id="CITY",
     record_types=["fact", "preference", "guideline"],
 )
 ```
+
+**To search records you wrote with no user_id** (e.g. `memory.add_memory(content=..., agent_id="CITY")` — global guidelines):
+```python
+memory.search(..., user_id=None, agent_id="CITY", record_types=["memory"])
+```
+
+**To genuinely search across users** (not allowed in the high-level API), either:
+- Drop to the private store: `memory._store.search(query, k, user_id=None, exact_user_match=False, ...)`
+- Or query `CITY_MEMORY` directly with SQL (`SELECT ... WHERE memory_type IN (...)`)
+
+Same kind of trap for `agent_id` and `thread_id`, though those don't have the `exact_*_match=False` rejection.
 
 ### Duplicate or near-duplicate extracted facts
 The SDK's dedup is LLM-judged, not fingerprinted. Near-duplicates can slip through, especially when you re-run a cell (re-extraction on the same input produces paraphrased versions).
