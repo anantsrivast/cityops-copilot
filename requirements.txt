@@ -1,0 +1,14 @@
+# CPU-only PyTorch (prevents 5GB CUDA download in Codespaces).
+# sentence-transformers is the workshop's local embedder, plugged into the
+# SDK via a small IEmbedder wrapper (no API key required).
+--extra-index-url https://download.pytorch.org/whl/cpu
+torch
+oracleagentmemory
+sentence-transformers
+oracledb
+openai
+jupyter
+ipykernel
+ipywidgets
+matplotlib
+pydantic
