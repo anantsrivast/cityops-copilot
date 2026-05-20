@@ -5,10 +5,10 @@ __pycache__/
 *.egg-info/
 .pytest_cache/
 
-# Virtual envs
-venv/
-.venv/
-env/
+# Virtual envs (no trailing slash so symlinks are also covered)
+venv
+.venv
+env
 .env
 
 # Jupyter
