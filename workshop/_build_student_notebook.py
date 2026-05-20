@@ -938,10 +938,29 @@ md(
     "concern on the same asset. Watch what the copilot tells Vance."
 )
 
+md(
+    "### Day 1 — Mercer's Visit Uses Both Functions, In Sequence\n\n"
+    "The two functions you built in Parts 4 and 6 play **complementary roles** "
+    "in a real inspection workflow. Mercer's day-1 visit shows both:\n\n"
+    "| Step | Function | Role | Cost |\n"
+    "|---|---|---|---|\n"
+    "| 1 | `call_copilot(...)` | Reasoning interface. Mercer types what she sees; the copilot interprets, suggests, surfaces any prior findings on this asset. | ~4 LLM calls, 30–60 s |\n"
+    "| 2 | `log_finding(...)` | System of record. Mercer decides what the finding is and stores it as a structured row with category, severity, recommendation, grade. | 0 LLM calls, ~100 ms |\n\n"
+    "**Why both?** `call_copilot` is the diagnostic dialogue; `log_finding` is "
+    "the formal record. The structured row Mercer logs in step 2 becomes "
+    "**searchable evidence** for the next inspector's `call_copilot` invocation "
+    "— via `find_similar_findings` inside the copilot — closing the loop.\n\n"
+    "Below: each function gets its own cell."
+)
+
 code(
-    "# Day 1, 10:00 — Inspector Mercer reviews Harbor Bridge and logs corrosion\n"
+    "# Step 1 — Mercer reports what she sees and asks the copilot for help.\n"
+    "# This is the REASONING call: builds a context card, vector-searches\n"
+    "# CITY_INSPECTION_FINDING for prior issues on Harbor Bridge, and runs the\n"
+    "# agent LLM. On this first visit there are no prior findings, so the\n"
+    "# copilot's response is mostly fresh diagnosis.\n"
     "print(\"=\" * 70)\n"
-    "print(\"DAY 1: Inspector Mercer on Harbor Bridge\")\n"
+    "print(\"DAY 1, step 1: Mercer calls call_copilot for diagnostic help\")\n"
     "print(\"=\" * 70)\n"
     "MERCER_NOTES = call_copilot(\n"
     "    narrative=(\n"
@@ -954,18 +973,39 @@ code(
     "    thread_id=\"asset_harbor_bridge\",\n"
     "    asset_id=\"Harbor Bridge\",\n"
     ")\n"
-    "# Mercer logs the formal finding\n"
-    "log_finding(\n"
+    "print(f\"\\nMercer's copilot response:\\n{MERCER_NOTES}\")"
+)
+
+md(
+    "Now Mercer has decided this is a real corrosion concern. The copilot's "
+    "answer helped her think; the structured fields are her conclusion.\n\n"
+    "**Step 2** is the recording call — `log_finding` writes one row into "
+    "`CITY_INSPECTION_FINDING` with the embedding computed locally on the "
+    "`description`. No LLM, no thread, no context card. Cheap and deterministic.\n\n"
+    "This row is what `find_similar_findings` will surface for the next inspector."
+)
+
+code(
+    "# Step 2 — Mercer formally records the finding she's now confident about.\n"
+    "# Pure persistence: one INSERT + one local embedding. Fast and free.\n"
+    "MERCER_FINDING_ID = log_finding(\n"
     "    asset_id=\"Harbor Bridge\",\n"
     "    inspector=\"Evelyn_H_Mercer\",\n"
     "    category=\"corrosion\",\n"
     "    severity=\"medium\",\n"
-    "    description=\"Surface corrosion + pitting on steel bearing assemblies at Pier 2 south, ~25% section loss; rust bleed onto concrete pedestal; ~1.5m longitudinal extent.\",\n"
-    "    recommendation=\"Remove loose corrosion products, apply corrosion-inhibiting primer + finish coat to affected bearing assemblies within 60 days; re-inspect annually with caliper section-loss measurements.\",\n"
+    "    description=(\n"
+    "        \"Surface corrosion + pitting on steel bearing assemblies at Pier 2 south, \"\n"
+    "        \"~25% section loss; rust bleed onto concrete pedestal; ~1.5m longitudinal extent.\"\n"
+    "    ),\n"
+    "    recommendation=(\n"
+    "        \"Remove loose corrosion products, apply corrosion-inhibiting primer + finish \"\n"
+    "        \"coat to affected bearing assemblies within 60 days; re-inspect annually with \"\n"
+    "        \"caliper section-loss measurements.\"\n"
+    "    ),\n"
     "    overall_grade=\"C\",\n"
     "    days_ago=0,\n"
     ")\n"
-    "print(f\"\\n Mercer's copilot response:\\n{MERCER_NOTES}\")"
+    "print(f\"Logged finding {MERCER_FINDING_ID} — now searchable by future call_copilot invocations.\")"
 )
 
 code(
@@ -986,8 +1026,29 @@ code(
     "print(f\"\\n Mercer's followup response:\\n{MERCER_FOLLOWUP}\")"
 )
 
+md(
+    "### Day N — Vance Only Calls `call_copilot`. Why?\n\n"
+    "Vance is in the diagnostic phase — he's seen rust bleed and possible "
+    "spalling, but he hasn't decided what the finding is yet. He calls "
+    "`call_copilot` to **interpret** what he's seeing, not to record anything.\n\n"
+    "Under the hood, `call_copilot` does two things that pull in Mercer's prior "
+    "work without anyone telling it to:\n\n"
+    "1. **`find_similar_findings(...)`** vector-searches `CITY_INSPECTION_FINDING` "
+    "for Harbor Bridge — Mercer's logged finding (the row from the cell above) "
+    "is the top hit. The copilot's prompt gets her category, severity, "
+    "recommendation, and grade as structured fields.\n"
+    "2. **`thread.get_context_card(...)`** assembles Mercer's earlier messages + "
+    "any auto-extracted facts/guidelines/preferences from those messages. So "
+    "Vance gets her conversational reasoning + soft observations (like "
+    "*coordinate with Q3 deck resurfacing*) that the formal finding doesn't carry.\n\n"
+    "If Vance later confirms his diagnosis, he'd add a step-2 `log_finding(...)` "
+    "of his own — but the workshop stops here because the magic moment is "
+    "Vance's reasoning being shaped by Mercer's prior work without human handoff."
+)
+
 code(
     "# Day N (later) — Inspector Vance arrives. Different inspector, same asset.\n"
+    "# Only call_copilot — Vance is still in diagnosis mode, not yet recording.\n"
     "print(\"\\n\" + \"=\" * 70)\n"
     "print(\"DAY N: Inspector Vance on Harbor Bridge (never met Mercer)\")\n"
     "print(\"=\" * 70)\n"
@@ -1001,7 +1062,7 @@ code(
     "    thread_id=\"asset_harbor_bridge\",\n"
     "    asset_id=\"Harbor Bridge\",\n"
     ")\n"
-    "print(f\"\\n Vance's copilot response (built from Mercer's work, NO human handoff):\\n{VANCE_DIAGNOSIS}\")"
+    "print(f\"\\nVance's copilot response (built from Mercer's work, NO human handoff):\\n{VANCE_DIAGNOSIS}\")"
 )
 
 md(
