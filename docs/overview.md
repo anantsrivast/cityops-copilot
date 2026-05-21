@@ -1,8 +1,10 @@
 # CityOps Copilot — Workshop One-Pager
 
-An inspector / city-operations copilot that remembers every asset's maintenance and inspection history across inspectors. Built on Oracle AI Database + the `oracleagentmemory` SDK, seeded with a realistic dataset of 308 maintenance logs + ~220 structured inspection findings across 26 urban infrastructure assets (bridges, substations, pipelines, water treatment, sensors, comms, civil works).
+A hands-on workshop on the **fundamentals of agent memory** — the architectural patterns that let AI agents remember across sessions, across users, and within the hard ceiling of the LLM's context window. You'll learn the distinct memory types that matter (typed semantic facts vs structured domain objects vs ephemeral conversation), how the context-window token budget shapes every retrieval decision, how to compress long history with running summaries and on-demand context cards, and how to mix vector similarity with relational filters for precise recall.
 
-The killer moment: a new inspector walks up to Harbor Bridge with a corrosion concern. They've never met the prior inspector. The copilot already cites the prior inspector's findings, severity grades, recommendations, and remaining-life estimates — pulling from both the SDK's auto-extracted memory and the `CITY_INSPECTION_FINDING` SQL table via `VECTOR_DISTANCE()`.
+The concepts land through a realistic use case — a city-infrastructure inspection copilot seeded with **308 real maintenance narratives and ~220 structured findings across 26 urban assets** (bridges, substations, pipelines, water treatment, sensors, comms, civil works). The wow moment is a **cross-inspector handoff**: Inspector B walks up to Harbor Bridge with a corrosion concern weeks after Inspector A inspected it, and the copilot surfaces A's findings, severity grades, recommendations, and tribal observations with zero human briefing — pulling from both the SDK's auto-extracted memory and the `CITY_INSPECTION_FINDING` SQL table via `VECTOR_DISTANCE()`.
+
+Implemented on **Oracle AI Database with the `oracleagentmemory` SDK**, but the architectural patterns transfer to any agent-memory stack.
 
 ---
 

@@ -1,6 +1,6 @@
 # CityOps Copilot — Agent Memory Workshop
 
-An inspector / city-operations copilot that remembers every asset's maintenance history across inspectors. Built on Oracle AI Database + the `oracleagentmemory` SDK. The killer moment: a new inspector encounters a corrosion concern on Harbor Bridge, and the copilot already knows what the prior inspector observed, recommended, and graded — without anyone telling it.
+A hands-on workshop on the **fundamentals of agent memory** — the architectural patterns that let AI agents remember across sessions, across users, and within the hard ceiling of the LLM's context window. You'll learn the distinct memory types that matter (typed semantic facts vs structured domain objects vs ephemeral conversation), how the context-window token budget shapes every retrieval decision, how to compress long history with running summaries and on-demand context cards, and how to mix vector similarity with relational filters for precise recall. The concepts land through a realistic use case — a city-infrastructure inspection copilot seeded with **308 real maintenance narratives and ~220 structured findings across 26 urban assets** — so you spend the time understanding the patterns, not faking data. The wow moment is a **cross-inspector handoff**: Inspector B walks up to a bridge that Inspector A inspected last quarter, and the copilot surfaces A's findings, recommendations, and tribal observations with zero human briefing. Implemented on **Oracle AI Database with the `oracleagentmemory` SDK**, but the architectural patterns transfer to any agent-memory stack — you walk away with a mental model that maps onto whatever you build next.
 
 ## The Data
 
@@ -38,7 +38,7 @@ The `oracleagentmemory` SDK only allows 4 record types in its MEMORY table (`fac
 | 5 | Scoping: inspector-personal vs city-wide | — (guided demo) |
 | 6 | End-to-end CityOps copilot + cross-inspector handoff demo | TODO 6 |
 
-## Killer Demo
+## Demo
 
 Inspector A logs a finding on Harbor Bridge ("corrosion on Pier 2 bearing assemblies, ~25% section loss"). Days later, Inspector B inspects Harbor Bridge for a different concern. They've never met A. The copilot's response references A's prior finding, A's recommendation (timeline + materials), and the most recent grade — pulling from both the SDK's auto-extracted memory and the `CITY_INSPECTION_FINDING` SQL table via `VECTOR_DISTANCE()`. Zero human handoff.
 
