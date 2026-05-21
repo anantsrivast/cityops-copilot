@@ -27,7 +27,7 @@ The asset mix spans bridges, substations, pipelines, water treatment plants, sen
 
 ## Architecture — Two Storage Layers
 
-The `oracleagentmemory` SDK  allows 4 record types in its MEMORY table (`fact`, `memory`, `preference`, `guideline`). Domain objects need their own SQL tables on the same connection.
+The `oracleagentmemory` SDK ships with 4 native record types in its MEMORY table (`fact`, `memory`, `preference`, `guideline`) — covering conversational and tribal-knowledge memory. For structured domain objects (asset registries, inspection findings), you bring your own SQL tables alongside — same connection, same Oracle vector engine.
 
 | Layer | What lives here | Implementation |
 |---|---|---|
