@@ -1,17 +1,18 @@
 # CityOps Copilot — Agent Memory Workshop
- A hands-on workshop on the fundamentals of agent memory — the architectural patterns that let AI agents remember across sessions, across
-  users, and within the hard ceiling of the LLM's context window. You'll learn the distinct memory types that matter (typed semantic facts vs
-   structured domain objects vs ephemeral conversation), how the context-window token budget shapes every retrieval decision, how to compress
-   long history with running summaries and on-demand context cards, and how to mix vector similarity with relational filters for precise
-  recall. The concepts land through a realistic use case — a city-infrastructure inspection copilot seeded with 308 real maintenance
-  narratives and ~220 structured findings across 26 urban assets — so you spend the time understanding the patterns, not faking data. The wow
-   moment is a cross-inspector handoff: Inspector B walks up to a bridge that Inspector A inspected last quarter, and the copilot surfaces
-  A's findings, recommendations, and tribal observations with zero human briefing. Implemented on Oracle AI Database with the
-  oracleagentmemory SDK, but the architectural patterns transfer to any agent-memory stack — you walk away with a mental model that maps onto
-   whatever you build next.
 
- ## Use Case
-  
+This hands-on workshop shows how to implement agent memory as a first-class capability end to end on Oracle AI Database. Explore **episodic memory** (per-asset conversation threads and per-finding records), **semantic memory** (auto-extracted facts and preferences + a queryable asset registry), and **procedural memory** (auto-extracted operating guidelines from inspection narratives), all assembled into bounded **working memory** via on-demand context cards. With the `oracleagentmemory` SDK and a **minimal Python harness — no LangChain, no agent framework** — you will build a city-operations inspection copilot with persistent state, cross-inspector recall, and patterns that get sharper as the inspection history grows. Learn context engineering techniques such as running-summary compaction and bounded context cards, plus memory engineering for hybrid retrieval that mixes vector similarity with relational filters in a single `VECTOR_DISTANCE` SQL statement. See how memory fits into the agent loop from ingestion and recall to reasoning and action, with runnable Python code and production-ready patterns.
+
+## Memory Types — Where Each Lives
+
+| Classical type | What it means | How this workshop covers it |
+|---|---|---|
+| **Episodic** | Specific events: what happened, when, by whom | `CITY_MESSAGE` (raw inspection narratives) + `CITY_INSPECTION_FINDING` (one row per finding, with inspector + timestamp) |
+| **Semantic** | General durable knowledge, declarative facts | SDK auto-extracted `fact` + `preference` records, `CITY_ASSET` registry, plus the `recommendation` field on each finding |
+| **Procedural** | Reusable patterns, operating rules, "next time do X" lessons | SDK auto-extracted `guideline` records (e.g. *"on Harbor Bridge, check sensor 4B before declaring a jam"*) |
+| **Working** | Bounded context the LLM sees this turn | The SDK's **context card** — assembled fresh per call from summary, topics, top-K relevant memories, and recent messages |
+
+## Use Case
+
 An inspector / city-operations copilot that remembers every asset's maintenance history across inspectors. Built on Oracle AI Database + the `oracleagentmemory` SDK. The key moment: a new inspector encounters a corrosion concern on Harbor Bridge, and the copilot already knows what the prior inspector observed, recommended, and graded — without anyone telling it.
 
 ## The Data
